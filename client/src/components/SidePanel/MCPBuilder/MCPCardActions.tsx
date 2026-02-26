@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pencil, PlugZap, SlidersHorizontal, RefreshCw, X, Trash2 } from 'lucide-react';
+import { Pencil, PlugZap, SlidersHorizontal, RefreshCw, X, Trash2, Unplug } from 'lucide-react';
 import { Spinner, TooltipAnchor } from '@librechat/client';
 import type { MCPServerStatus } from 'librechat-data-provider';
 import { useLocalize } from '~/hooks';
@@ -27,7 +27,8 @@ interface MCPCardActionsProps {
  * - Pencil: Edit server definition (Settings panel only)
  * - PlugZap: Connect/Authenticate (for disconnected/error servers)
  * - SlidersHorizontal: Configure custom variables (for connected servers with vars)
- * - Trash2: Revoke OAuth access (for connected OAuth servers)
+ * - Unplug: Disconnect (for all connected servers)
+ * - Trash2: Revoke OAuth access (for disconnected OAuth servers)
  * - RefreshCw: Reconnect/Refresh (for connected servers)
  * - Spinner: Loading state (with X on hover for cancel)
  */
@@ -166,8 +167,22 @@ export default function MCPCardActions({
         </TooltipAnchor>
       )}
 
+      {/* Disconnect button - for all connected servers */}
+      {isConnected && onRevoke && (
+        <TooltipAnchor
+          description={localize('com_nav_mcp_disconnect')}
+          side="top"
+          className={cn(buttonBaseClass, 'text-red-500 hover:text-red-600')}
+          aria-label={localize('com_nav_mcp_disconnect')}
+          role="button"
+          onClick={onRevoke}
+        >
+          <Unplug className="size-3.5" aria-hidden="true" />
+        </TooltipAnchor>
+      )}
+
       {/* Revoke button - for OAuth servers (available regardless of connection state) */}
-      {serverStatus?.requiresOAuth && onRevoke && (
+      {serverStatus?.requiresOAuth && !isConnected && onRevoke && (
         <TooltipAnchor
           description={localize('com_ui_revoke')}
           side="top"
